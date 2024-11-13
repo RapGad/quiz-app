@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Quiz App</h1>
+
+    <main>
+        <section class="welcome">
+            <h2>Welcome to my quiz App</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                Reiciendis explicabo sunt a laborum temporibus nisi iure doloribus nulla porro. 
+                Tempora cum eos nulla repellat. Commodi a dolorem et quas dolorum.
+            </p>
+        </section>
+        
+        <div class="preferences">
+            <h3>Please choose your preferences</h3>
+            <div class="levelRadioBtns">
+                <p>Please Select the difficulty Level</p>
+                <label for="difficulty">
+                    <input type="radio" name="difficulty" value="easy">
+                    Easy
+                </label>
+                <label for="difficulty">
+                    <input type="radio" name="difficulty" value="medium">
+                    Medium
+                </label>
+                <label for="difficulty">
+                    <input type="radio" name="difficulty" value="Hard">
+                    Hard
+                </label>
+            </div>
+
+            <div class="categories">
+                <label for="category">Please choose category</label>
+                <select name="category" id="category">
+                    <option value="--">--</option>
+                    <option value="10">General knowledge</option>
+                    <option value="11">Entertainment, Music</option>
+                    <option value="11">Entertainment, Video games</option>
+                    <option value="18">Science, Computers</option>
+                    <option value="19">Science, Mathematics</option>
+                    <option value="21">Sports</option>
+                    <option value="22">Geography</option>
+                </select>
+
+            </div>
+
+            <button id="continue">Start quiz</button>
+        </div>
+        
+
+    </main>
+    <script src="index.js"></script>
+</body>
+</html>
