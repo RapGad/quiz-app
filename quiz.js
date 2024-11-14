@@ -41,12 +41,13 @@ const getQuestions = async()=>{
  function createQuestionTag(number){
     const loadedQuestions =  Allquestions//await getQuestions()
     let correctAnswer = Math.floor(Math.random()*4) 
-    console.log(correctAnswer)
 
     let ans
     
     let eachQuestion = loadedQuestions.map((item)=>{
-        ans = item.incorrectAnswers.push(item.correctAnswer)
+    //Use the splice method in this manner splice(index,items to remove, item to replace with)
+
+        ans = item.incorrectAnswers.splice(correctAnswer,0,item.correctAnswer)
 
         return `
         <p class="question">
@@ -57,7 +58,7 @@ const getQuestions = async()=>{
     ${item.incorrectAnswers.map((answer,index)=>{
         //console.log(ans)
         //Wrong logic, Replaces the element at that particular index
-        return index === correctAnswer ? `<li id=${index}>${item.incorrectAnswers[item.incorrectAnswers.length-1]}</li>`:`
+        return index === correctAnswer ? `<li class=answer id=${index}>${item.incorrectAnswers[index]}</li>`:`
         <li class=answer id=${index}>${answer}</li>`
   
     }).join("")}
@@ -72,9 +73,9 @@ const getQuestions = async()=>{
 
     answers.forEach(answer=>{
         answer.addEventListener('click',(e)=>{
-            console.log(e.target.id)
             if(e.target.id == correctAnswer){
-                answer.classList.add = 'correct'
+                console.log(e.target.id)
+                e.target.classList.add = 'correct'
                 score.textContent = `${Number(score.innerText)+ 10}/100`
             }
             else{
