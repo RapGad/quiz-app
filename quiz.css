@@ -53,11 +53,19 @@ hr{
 }
 
 .answers li{
-    border: 1px solid red;
     border-radius: 5px;
     padding: .8rem;
     margin-bottom: .8rem;
+    font-size: .85rem;
     cursor: pointer;
+    transition: .3s ease;
+    background-color: rgb(174, 170, 170,.2);
+}
+
+.answers li:hover{
+    /*background: rgba(0, 0, 0, .1);*/
+    border: 1px solid #e0e0e0;
+    background: transparent;
 }
 
 .footer{
@@ -72,4 +80,14 @@ button{
     border: 1px;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.correct{
+    border: 1px #4caf50;
+    background: transparent;
+}
+
+.wrong{
+    border: 1px red;
+    background: transparent;
 }
