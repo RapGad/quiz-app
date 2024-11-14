@@ -3,9 +3,18 @@ const selectedDifficulty = localStorage.getItem('difficulty')
 const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
+const score = document.querySelector(".score")
 
 let questionNumber = 0
 let questions = null
+
+const Allquestions = [
+    {
+        question: "Who is the fastest rapper?",
+        correctAnswer: "Sarkodie",
+        incorrectAnswers: [ "Manifest","Flowking Stone","Amerado"]
+    }
+]
 
 
 let progress = 0;
@@ -29,13 +38,15 @@ const getQuestions = async()=>{
 
 
 
-async function createQuestionTag(number){
-    const loadedQuestions = await getQuestions()
-    let correctAnswer = Math.floor(Math.random()*3) 
+ function createQuestionTag(number){
+    const loadedQuestions =  Allquestions//await getQuestions()
+    let correctAnswer = Math.floor(Math.random()*4) 
+    console.log(correctAnswer)
+
     let ans
     
-    let eachQuestion = loadedQuestions[number].map((item)=>{
-        ans = item.correctAnswer
+    let eachQuestion = loadedQuestions.map((item)=>{
+        ans = item.incorrectAnswers.push(item.correctAnswer)
 
         return `
         <p class="question">
@@ -44,13 +55,15 @@ async function createQuestionTag(number){
          <ul class="answers">
 
     ${item.incorrectAnswers.map((answer,index)=>{
-        index === correctAnswer ? ` <li id=${index}>${ans}</li>`:`
+        //console.log(ans)
+        //Wrong logic, Replaces the element at that particular index
+        return index === correctAnswer ? `<li id=${index}>${item.incorrectAnswers[item.incorrectAnswers.length-1]}</li>`:`
         <li class=answer id=${index}>${answer}</li>`
   
-    })}
+    }).join("")}
           </ul>
         `
-    })
+    }).join("")
 
     questionsContainer.innerHTML = eachQuestion
 
@@ -59,8 +72,10 @@ async function createQuestionTag(number){
 
     answers.forEach(answer=>{
         answer.addEventListener('click',(e)=>{
+            console.log(e.target.id)
             if(e.target.id == correctAnswer){
                 answer.classList.add = 'correct'
+                score.textContent = `${Number(score.innerText)+ 10}/100`
             }
             else{
                 answer.classList.add ='wrong'
