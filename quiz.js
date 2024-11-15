@@ -4,38 +4,43 @@ const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
 const score = document.querySelector(".score")
+let questions = []
+let isLoading = false 
+let error = false
+
+
+function decodeHtmlEntities(encodedStr) {
+    return encodedStr.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+                     .replace(/&amp;/g, '&')
+                     .replace(/&lt;/g, '<')
+                     .replace(/&gt;/g, '>')
+                     .replace(/&quot;/g, '"')
+                     .replace(/&#039;/g, "'");
+  }
+  
 
 let questionNumber = 0
-let questions = null
-
-const Allquestions = [
-    {
-        question: "Who is the fastest rapper?",
-        correctAnswer: "Sarkodie",
-        incorrectAnswers: [ "Manifest","Flowking Stone","Amerado"]
-    },
-    {
-        question: "What is my name?",
-        correctAnswer: "Jeffrey",
-        incorrectAnswers: ["Akuako","Master","KillerBean"]
-    }
-]
-
 
 let progress = 0;
 
 
 const getQuestions = async()=>{
-    let err = null
-    try{
-        const data = await fetch(url)
-        questions = await data.json()
-        return questions.results
+    error = true
 
-
-    }catch(error){
-        console.log(error)
-
+    if(questions.length === 0 && !isLoading){
+        isLoading = true
+        try{
+            const data = await fetch(url)
+            questions = await data.json()
+            error = false
+            return questions
+    
+    
+        }catch(error){
+            console.error(error)
+            error = true
+    
+        }
     }
 
     
@@ -43,40 +48,60 @@ const getQuestions = async()=>{
 
 
 
- function createQuestionTag(number){
-    const loadedQuestions =  Allquestions//await getQuestions()
+ async function createQuestionTag(number){
+    await getQuestions()
+    const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
+    console.log(error)
+
+    if(isLoading && !error){
+        questionsContainer.innerHTML = '<p style="text-align: center">Loading...</p>'
+        return
+    }
+
+    if(error){
+        questionsContainer.innerHTML = '<p style="text-align: center">Error Occured</p>'
+    }
+
+        if(loadedQuestions.length > 0 && !error){
+            Object.entries(loadedQuestions[number]).map(([key,value])=>{
+            //let ansValue
+            if(key == 'question'){
+                let question = document.createElement('p')
+                question.setAttribute('class','question')
+                question.textContent = `${number+1}.${decodeHtmlEntities(value)}`
+                questionsContainer.innerHTML = ''
+                questionsContainer.appendChild(question)
+            }
+    
+            else if (key == 'correct_answer'){
+                ansValue = value
+            }
+    
+            else if(key == 'incorrect_answers'){
+                value.splice(correctAnswer,0,ansValue)
+                const answersContainer = document.createElement('ul')
+                answersContainer.setAttribute('class','answers')
+                value.map((answer,index)=>{
+                    let ans = document.createElement('li')
+                    ans.setAttribute('id',index)
+                    ans.setAttribute('class','answer')
+                    ans.textContent = decodeHtmlEntities(answer)
+                    answersContainer.appendChild(ans)
+                })
+                questionsContainer.appendChild(answersContainer)
+    
+            }
+    
+        })}
+
+        else{
+            questionsContainer.innerHTML = `<p style="text-align: center">Error Occured</p>`
+            return 
+        }
 
     
-    /* let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
-    //Use the splice method in this manner splice(index,items to remove, item to replace with)
-        console.log(key)
-        let ans
-
-        //let ans = key == 'correctAnswer' ? value : null
-        if(key == 'correctAnswer') ans = value
-        console.log(ans)
-
-        if(key == value) value.splice(correctAnswer,0, ans)
-       //key == 'incorrectAnswers' ? value.splice(correctAnswer,0, ans): value
-
-        return  `
-        <p class="question">
-            ${questionNumber + 1}. ${ key == 'question' ? value : null}
-        </p>
-         <ul class="answers">
-
-    ${key == 'incorrectAnswers' ? value.map((answer,index)=>{
-        return index === correctAnswer ? `<li class=answer id=${index}>${value[index]}</li>`:`
-        <li class=answer id=${index}>${answer}</li>`
-  
-    }).join(""): null}
-          </ul>
-        `
-    }).join("")
-
-    questionsContainer.innerHTML = eachQuestion
 
 
     const answers = document.querySelectorAll(".answer")
@@ -85,7 +110,7 @@ const getQuestions = async()=>{
         answer.addEventListener('click',(e)=>{
             if(e.target.id == correctAnswer){
                 answer.style.border = "1px solid #4caf50"
-                score.textContent = `${Number(score.innerText)+ 10}/100`
+                score.textContent = `${Number(score.innerText)+ 10}`
             }
             else{
                 answer.style.border = "1px solid red"
@@ -93,53 +118,20 @@ const getQuestions = async()=>{
                     if(answer.id == correctAnswer){
                         answer.style.border = "1px solid #4caf50"
                     }
-                    //else answer.style.border = "1px solid red"
                 })
 
             }
-        })
-
-
-    }) */
-
-    let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
-        //let ansValue
-        if(key == 'question'){
-            let question = document.createElement('p')
-            question.setAttribute('class','question')
-            question.textContent = value
-            questionsContainer.appendChild(question)
-            console.log(question)
-        }
-
-        else if (key == 'correctAnswer'){
-            ansValue = value
-        }
-
-        else if(key == 'incorrectAnswers'){
-            value.splice(correctAnswer,0,ansValue)
-            const answersContainer = document.createElement('ul')
-            answersContainer.setAttribute('class','answers')
-            const answers = value.map((answer,index)=>{
-                let ans = document.createElement('li')
-                ans.setAttribute('id',index)
-                ans.setAttribute('class','answer')
-                ans.textContent = answer
-            }).join("")
-            console.log(answers)
-
-            answersContainer.append(answers)
-        }
-
-    })
-
-eachQuestion
+        })})
 
 }
 createQuestionTag(questionNumber)
 
 nextQuestionButton.addEventListener("click",()=>{
+    
     questionNumber ++
+    if(questionNumber === 9){
+        alert("All done")
+    }
     createQuestionTag(questionNumber)
     if (progress < 100) {
         progress += 10; // Increase by 10% each time
@@ -148,24 +140,3 @@ nextQuestionButton.addEventListener("click",()=>{
     
 })
 
-
-/* const arr = [
-    {
-        country: "Ghana",
-        city: "sunyani",
-        nums: [1,2,3,4]
-    },
-    {
-        country: "Sudan",
-        city: "Aman"
-    },
-
-    {
-
-    }
-]
-
-
-Object.entries(arr[0]).map(([key,value])=>{
-    key == 'nums' ? console.log(value):null
-}) */
