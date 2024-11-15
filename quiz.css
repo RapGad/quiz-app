@@ -52,7 +52,7 @@ hr{
     list-style: none;
 }
 
-.answers li{
+.answer{
     border-radius: 5px;
     padding: .8rem;
     margin-bottom: .8rem;
@@ -62,11 +62,10 @@ hr{
     background-color: rgb(174, 170, 170,.2);
 }
 
-.answers li:hover{
-    /*background: rgba(0, 0, 0, .1);*/
+/* .answer:hover{
     border: 1px solid #e0e0e0;
     background: transparent;
-}
+} */
 
 .footer{
     display: flex;

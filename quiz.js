@@ -13,6 +13,11 @@ const Allquestions = [
         question: "Who is the fastest rapper?",
         correctAnswer: "Sarkodie",
         incorrectAnswers: [ "Manifest","Flowking Stone","Amerado"]
+    },
+    {
+        question: "What is my name?",
+        correctAnswer: "Jeffrey",
+        incorrectAnswers: ["Akuako","Master","KillerBean"]
     }
 ]
 
@@ -44,14 +49,14 @@ const getQuestions = async()=>{
 
     let ans
     
-    let eachQuestion = loadedQuestions.map((item)=>{
+    let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
     //Use the splice method in this manner splice(index,items to remove, item to replace with)
 
-        ans = item.incorrectAnswers.splice(correctAnswer,0,item.correctAnswer)
+        //ans = item.incorrectAnswers.splice(correctAnswer,0,item.correctAnswer)
 
         return `
         <p class="question">
-            ${questionNumber + 1}. ${item.question}
+            ${questionNumber + 1}. ${key}
         </p>
          <ul class="answers">
 
@@ -74,16 +79,25 @@ const getQuestions = async()=>{
     answers.forEach(answer=>{
         answer.addEventListener('click',(e)=>{
             if(e.target.id == correctAnswer){
-                console.log(e.target.id)
-                e.target.classList.add = 'correct'
+                answer.style.border = "1px solid #4caf50"
                 score.textContent = `${Number(score.innerText)+ 10}/100`
             }
             else{
-                answer.classList.add ='wrong'
+                answer.style.border = "1px solid red"
+                answers.forEach(answer=> {
+                    if(answer.id == correctAnswer){
+                        answer.style.border = "1px solid #4caf50"
+                    }
+                    //else answer.style.border = "1px solid red"
+                })
+
             }
-            answer == correctAnswer ? answer.classList.add = 'correct': answer.classList.add = 'dim'
         })
+
+
     })
+
+
 
 }
 createQuestionTag(questionNumber)
@@ -98,3 +112,17 @@ nextQuestionButton.addEventListener("click",()=>{
     
 })
 
+
+const arr = [
+    {
+        country: "Ghana",
+        city: "sunyani"
+    },
+    {
+        country: "Sudan",
+        city: "Aman"
+    },
+]
+
+
+console.log(arr[0])
