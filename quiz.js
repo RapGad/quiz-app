@@ -4,13 +4,14 @@ const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
 const score = document.querySelector(".score")
+const popUpContainer = document.querySelector('.pop-up')
 let questions = []
 let isLoading = false 
 let error = false
 
 
 function decodeHtmlEntities(encodedStr) {
-    return encodedStr.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+    return encodedStr.replace(/&#(\d+);/g, (dec) => String.fromCharCode(dec))
                      .replace(/&amp;/g, '&')
                      .replace(/&lt;/g, '<')
                      .replace(/&gt;/g, '>')
@@ -21,11 +22,10 @@ function decodeHtmlEntities(encodedStr) {
 
 let questionNumber = 0
 
-let progress = 0;
+let progress = 10;
 
 
 const getQuestions = async()=>{
-    error = true
 
     if(questions.length === 0 && !isLoading){
         isLoading = true
@@ -57,7 +57,7 @@ const getQuestions = async()=>{
 
     if(isLoading && !error){
         questionsContainer.innerHTML = '<p style="text-align: center">Loading...</p>'
-        return
+        //return
     }
 
     if(error){
@@ -126,17 +126,21 @@ const getQuestions = async()=>{
 }
 createQuestionTag(questionNumber)
 
-nextQuestionButton.addEventListener("click",()=>{
+nextQuestionButton.addEventListener("click",(e)=>{
     
     questionNumber ++
-    if(questionNumber === 9){
-        alert("All done")
+    if(questionNumber === 10){
+        e.target.disabled = true
+        popUpContainer.classList.add('show')
+        //alert("All done")
+
     }
     createQuestionTag(questionNumber)
     if (progress < 100) {
         progress += 10; // Increase by 10% each time
         document.getElementById("progress-bar").style.width = progress + "%";
     }
+    
     
 })
 

@@ -5,10 +5,17 @@
 }
 
 
+body{
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 100vh;
+}
+
 .quizContainer{
     max-width: 500px;
     border: 2px solid red;
-    margin: 120px auto;
+    /*margin: 120px auto;*/
     padding: 2rem;
     border-radius: 8px;
 }
@@ -24,7 +31,7 @@
 
 .progress-bar {
     height: 100%;
-    width: 0%;
+    width: 10%;
     background-color: #4caf50;
     border-radius: 25px;
     transition: width 0.4s ease;
@@ -62,6 +69,48 @@ hr{
     background-color: rgb(174, 170, 170,.2);
 }
 
+.pop-up{
+    width: 100%;
+    height: 100%;
+    top: 0;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
+    backdrop-filter: blur(3px);
+    z-index: 2;
+    display: none;
+}
+
+.container{
+    background-color: #fff;
+    max-width: 300px;
+    padding: 1rem;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    box-shadow: 0 3px 3px ;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.container div{
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.container div button{
+    padding: .7rem 1rem;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 3px 3px;
+    cursor: pointer;
+}
+
 /* .answer:hover{
     border: 1px solid #e0e0e0;
     background: transparent;
@@ -73,7 +122,7 @@ hr{
     padding: .5rem;
 }
 
-button{
+#nextQuestion{
     margin-left: auto;
     padding: .6rem 1.8rem;
     border: 1px;
@@ -89,4 +138,8 @@ button{
 .wrong{
     border: 1px red;
     background: transparent;
+}
+
+.show{
+    display: flex;
 }
