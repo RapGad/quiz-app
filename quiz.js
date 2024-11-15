@@ -46,27 +46,32 @@ const getQuestions = async()=>{
  function createQuestionTag(number){
     const loadedQuestions =  Allquestions//await getQuestions()
     let correctAnswer = Math.floor(Math.random()*4) 
+    let ansValue
 
-    let ans
     
-    let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
+    /* let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
     //Use the splice method in this manner splice(index,items to remove, item to replace with)
+        console.log(key)
+        let ans
 
-        //ans = item.incorrectAnswers.splice(correctAnswer,0,item.correctAnswer)
+        //let ans = key == 'correctAnswer' ? value : null
+        if(key == 'correctAnswer') ans = value
+        console.log(ans)
 
-        return `
+        if(key == value) value.splice(correctAnswer,0, ans)
+       //key == 'incorrectAnswers' ? value.splice(correctAnswer,0, ans): value
+
+        return  `
         <p class="question">
-            ${questionNumber + 1}. ${key}
+            ${questionNumber + 1}. ${ key == 'question' ? value : null}
         </p>
          <ul class="answers">
 
-    ${item.incorrectAnswers.map((answer,index)=>{
-        //console.log(ans)
-        //Wrong logic, Replaces the element at that particular index
-        return index === correctAnswer ? `<li class=answer id=${index}>${item.incorrectAnswers[index]}</li>`:`
+    ${key == 'incorrectAnswers' ? value.map((answer,index)=>{
+        return index === correctAnswer ? `<li class=answer id=${index}>${value[index]}</li>`:`
         <li class=answer id=${index}>${answer}</li>`
   
-    }).join("")}
+    }).join(""): null}
           </ul>
         `
     }).join("")
@@ -95,9 +100,40 @@ const getQuestions = async()=>{
         })
 
 
+    }) */
+
+    let eachQuestion = Object.entries(loadedQuestions[number]).map(([key,value])=>{
+        //let ansValue
+        if(key == 'question'){
+            let question = document.createElement('p')
+            question.setAttribute('class','question')
+            question.textContent = value
+            questionsContainer.appendChild(question)
+            console.log(question)
+        }
+
+        else if (key == 'correctAnswer'){
+            ansValue = value
+        }
+
+        else if(key == 'incorrectAnswers'){
+            value.splice(correctAnswer,0,ansValue)
+            const answersContainer = document.createElement('ul')
+            answersContainer.setAttribute('class','answers')
+            const answers = value.map((answer,index)=>{
+                let ans = document.createElement('li')
+                ans.setAttribute('id',index)
+                ans.setAttribute('class','answer')
+                ans.textContent = answer
+            }).join("")
+            console.log(answers)
+
+            answersContainer.append(answers)
+        }
+
     })
 
-
+eachQuestion
 
 }
 createQuestionTag(questionNumber)
@@ -113,16 +149,23 @@ nextQuestionButton.addEventListener("click",()=>{
 })
 
 
-const arr = [
+/* const arr = [
     {
         country: "Ghana",
-        city: "sunyani"
+        city: "sunyani",
+        nums: [1,2,3,4]
     },
     {
         country: "Sudan",
         city: "Aman"
     },
+
+    {
+
+    }
 ]
 
 
-console.log(arr[0])
+Object.entries(arr[0]).map(([key,value])=>{
+    key == 'nums' ? console.log(value):null
+}) */
