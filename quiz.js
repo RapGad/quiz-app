@@ -4,7 +4,6 @@ const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
 const score = document.querySelector(".score")
-const popUpContainer = document.querySelector('.pop-up')
 let questions = []
 let isLoading = false 
 let error = false
@@ -23,6 +22,26 @@ function decodeHtmlEntities(encodedStr) {
 let questionNumber = 0
 
 let progress = 10;
+function prompt(/*score,level*/){
+    const divContainer = document.createElement('div')
+    divContainer.setAttribute('class','container')
+    const paraEl = document.createElement('p')
+    const btnsContainer = document.createElement('div')
+    btnsContainer.setAttribute('class','btns')
+    const replayButton = document.createElement('button')
+    const nextButton = document.createElement('button')
+
+    replayButton.addEventListener('click',()=>{
+        questionNumber = 0
+        createQuestionTag(questionNumber)
+
+    })
+    replayButton.textContent = 'replay'
+    nextButton.textContent = 'next'
+    btnsContainer.append(replayButton,nextButton)
+    divContainer.append(paraEl,btnsContainer)
+    questionsContainer.replaceChildren(divContainer)
+}
 
 
 const getQuestions = async()=>{
@@ -53,7 +72,6 @@ const getQuestions = async()=>{
     const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
-    console.log(error)
 
     if(isLoading && !error){
         questionsContainer.innerHTML = '<p style="text-align: center">Loading...</p>'
@@ -115,6 +133,8 @@ const getQuestions = async()=>{
             else{
                 answer.style.border = "1px solid red"
                 answers.forEach(answer=> {
+                    answer.style.pointerEvents = 'none'
+                    //console.log(PointerEvent)
                     if(answer.id == correctAnswer){
                         answer.style.border = "1px solid #4caf50"
                     }
@@ -131,11 +151,12 @@ nextQuestionButton.addEventListener("click",(e)=>{
     questionNumber ++
     if(questionNumber === 10){
         e.target.disabled = true
-        popUpContainer.classList.add('show')
+        prompt()
         //alert("All done")
 
     }
-    createQuestionTag(questionNumber)
+    else createQuestionTag(questionNumber)
+    //
     if (progress < 100) {
         progress += 10; // Increase by 10% each time
         document.getElementById("progress-bar").style.width = progress + "%";
