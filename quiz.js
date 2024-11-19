@@ -1,5 +1,6 @@
 const selectedCategory = localStorage.getItem('category')
 const selectedDifficulty = localStorage.getItem('difficulty')
+
 const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
@@ -22,9 +23,12 @@ function decodeHtmlEntities(encodedStr) {
 let questionNumber = 0
 
 let progress = 10;
-function prompt(score,lev,cate){
+function prompt(score,cate,lev){
+
     const category = cate
     const level = lev
+
+    console.log(category,level)
     const divContainer = document.createElement('div')
     divContainer.setAttribute('class','container')
     const paraEl = document.createElement('p')
@@ -34,15 +38,18 @@ function prompt(score,lev,cate){
     const nextButton = document.createElement('button')
 
     Number(score) < 5 ? nextButton.disabled = true : null
+    console.log(score)
 
     Number(score) >4 ? lev != 'hard' ?
     paraEl.textContent = `
-    You Scored ${score} out of 10 <br>
-    Do you wish to move to the next difficulty level or replay??`: `
-    You Scored ${score} out of 10 <br>
+    You Scored ${score} out of 10\n
+    Do you wish to move to the next difficulty level or replay??`:paraEl.textContent = `
+    You Scored ${score} out of 10 \n
     Yeeeyyyyy You beat Our last level
-    `: `You Scored ${score} out of 10 <br>
+    `: paraEl.textContent =`You Scored ${score} out of 10 \n
     Do you wish to replay`
+
+    console.log(paraEl.innerText)
 
 
     if (nextButton.disabled === false) {
@@ -69,13 +76,19 @@ function prompt(score,lev,cate){
     //And set that variable to to the parameters in the inner functions...
     replayButton.addEventListener('click',()=>{
         questionNumber = 0
+        progress = 10
+        console.log(category,level)
         createQuestionTag(questionNumber,category,level)
+        nextQuestionButton.disabled = false
 
     })
 
     nextButton.addEventListener('click',()=>{
         questionNumber = 0
+        progress = 10
         createQuestionTag(questionNumber,category,level)
+        nextQuestionButton.disabled = false
+
     })
 
 
@@ -111,15 +124,15 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
 
 
 
- async function createQuestionTag(number,category,level){
-    await getQuestions(category,level)
+ async function createQuestionTag(number,selectedCategory,selectedDifficulty){
+    console.log(selectedCategory,selectedDifficulty)
+    await getQuestions(selectedCategory,selectedDifficulty)
     const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
 
     if(isLoading){
         questionsContainer.innerHTML = '<p style="text-align: center">Loading...</p>'
-        return
     }
 
         if(loadedQuestions != undefined && loadedQuestions.length > 0){
@@ -183,7 +196,7 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
         })})
 
 }
-createQuestionTag(questionNumber)
+createQuestionTag(questionNumber,selectedCategory,selectedDifficulty)
 
 nextQuestionButton.addEventListener("click",(e)=>{
     
@@ -193,13 +206,21 @@ nextQuestionButton.addEventListener("click",(e)=>{
         prompt(Number(score.innerText),selectedCategory,selectedDifficulty)
 
     }
-    else createQuestionTag(questionNumber)
+    else createQuestionTag(questionNumber,selectedCategory,selectedDifficulty)
+
+    progressBar(progress)
     //
+    
+    
+    
+})
+
+
+function progressBar(progress){
     if (progress < 100) {
         progress += 10; // Increase by 10% each time
         document.getElementById("progress-bar").style.width = progress + "%";
     }
-    
-    
-})
+
+}
 
