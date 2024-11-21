@@ -1,7 +1,7 @@
 const selectedCategory = localStorage.getItem('category')
 const selectedDifficulty = localStorage.getItem('difficulty')
 
-const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
+//const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
 const score = document.querySelector(".score")
@@ -24,9 +24,9 @@ let questionNumber = 0
 
 let progress = 10;
 function prompt(score,cate,lev){
-
+    questions = []
     const category = cate
-    const level = lev
+    let level = lev
 
     console.log(category,level)
     const divContainer = document.createElement('div')
@@ -38,7 +38,6 @@ function prompt(score,cate,lev){
     const nextButton = document.createElement('button')
 
     Number(score) < 5 ? nextButton.disabled = true : null
-    console.log(score)
 
     Number(score) >4 ? lev != 'hard' ?
     paraEl.textContent = `
@@ -49,7 +48,6 @@ function prompt(score,cate,lev){
     `: paraEl.textContent =`You Scored ${score} out of 10 \n
     Do you wish to replay`
 
-    console.log(paraEl.innerText)
 
 
     if (nextButton.disabled === false) {
@@ -69,16 +67,25 @@ function prompt(score,cate,lev){
 
 
 
+    replayButton.textContent = 'replay'
+    nextButton.textContent = 'next'
+    btnsContainer.append(replayButton,nextButton)
+    divContainer.append(paraEl,btnsContainer)
+    questionsContainer.replaceChildren(divContainer)
+
+
 
 
     //The innner functions cannot take parameters from the outer functions
     //I have to create a variable in the outer function
     //And set that variable to to the parameters in the inner functions...
-    replayButton.addEventListener('click',()=>{
+    replayButton.addEventListener('click',async()=>{
+        console.log(questions)
         questionNumber = 0
         progress = 10
-        console.log(category,level)
-        createQuestionTag(questionNumber,category,level)
+
+        document.getElementById("progress-bar").style.width = progress + "%";
+        await createQuestionTag(questionNumber,category,level)
         nextQuestionButton.disabled = false
 
     })
@@ -86,18 +93,12 @@ function prompt(score,cate,lev){
     nextButton.addEventListener('click',()=>{
         questionNumber = 0
         progress = 10
+        document.getElementById("progress-bar").style.width = progress + "%";
+
         createQuestionTag(questionNumber,category,level)
         nextQuestionButton.disabled = false
 
     })
-
-
-
-    replayButton.textContent = 'replay'
-    nextButton.textContent = 'next'
-    btnsContainer.append(replayButton,nextButton)
-    divContainer.append(paraEl,btnsContainer)
-    questionsContainer.replaceChildren(divContainer)
 }
 
 
@@ -113,7 +114,6 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
     
         }catch(error){
             isLoading = false
-            console.error(error)
             error = true
     
         }
@@ -125,17 +125,21 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
 
 
  async function createQuestionTag(number,selectedCategory,selectedDifficulty){
-    console.log(selectedCategory,selectedDifficulty)
-    await getQuestions(selectedCategory,selectedDifficulty)
+    //console.log(selectedCategory,selectedDifficulty)
+
+    if(questions.length === 0) await getQuestions(selectedCategory,selectedDifficulty)
     const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
 
     if(isLoading){
-        questionsContainer.innerHTML = '<p style="text-align: center">Loading...</p>'
+        questionsContainer.innerHTML = `<p style="text-align:center">Loading...</p>`
+        nextQuestionButton.disabled = true
     }
 
+
         if(loadedQuestions != undefined && loadedQuestions.length > 0){
+            nextQuestionButton.disabled = false
             Object.entries(loadedQuestions[number]).map(([key,value])=>{
             if(key == 'question'){
                 let question = document.createElement('p')
@@ -176,6 +180,8 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
 
     const answers = document.querySelectorAll(".answer")
 
+
+
     answers.forEach(answer=>{
         answer.addEventListener('click',(e)=>{
             if(e.target.id == correctAnswer){
@@ -186,7 +192,6 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
                 answer.style.border = "1px solid red"
                 answers.forEach(answer=> {
                     answer.style.pointerEvents = 'none'
-                    //console.log(PointerEvent)
                     if(answer.id == correctAnswer){
                         answer.style.border = "1px solid #4caf50"
                     }
@@ -204,6 +209,7 @@ nextQuestionButton.addEventListener("click",(e)=>{
     if(questionNumber === 10){
         e.target.disabled = true
         prompt(Number(score.innerText),selectedCategory,selectedDifficulty)
+        console.log(questions)
 
     }
     else createQuestionTag(questionNumber,selectedCategory,selectedDifficulty)
@@ -214,6 +220,8 @@ nextQuestionButton.addEventListener("click",(e)=>{
     
     
 })
+
+
 
 
 function progressBar(progress){
