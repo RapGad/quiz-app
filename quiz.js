@@ -24,7 +24,6 @@ let questionNumber = 0
 
 let progress = 10;
 function prompt(score,cate,lev){
-    questions = []
     const category = cate
     let level = lev
 
@@ -38,6 +37,7 @@ function prompt(score,cate,lev){
     const nextButton = document.createElement('button')
 
     Number(score) < 5 ? nextButton.disabled = true : null
+    console.log(nextButton.disabled)
 
     Number(score) >4 ? lev != 'hard' ?
     paraEl.textContent = `
@@ -80,10 +80,9 @@ function prompt(score,cate,lev){
     //I have to create a variable in the outer function
     //And set that variable to to the parameters in the inner functions...
     replayButton.addEventListener('click',async()=>{
-        console.log(questions)
         questionNumber = 0
         progress = 10
-
+        questions = []
         document.getElementById("progress-bar").style.width = progress + "%";
         await createQuestionTag(questionNumber,category,level)
         nextQuestionButton.disabled = false
@@ -103,12 +102,13 @@ function prompt(score,cate,lev){
 
 
 const getQuestions = async(selectedCategory,selectedDifficulty)=>{
-
+    const apiUrl = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
     if(questions.length === 0 && !isLoading){
         isLoading = true
         try{
-            const data = await fetch(`https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`)
+            const data = await fetch(apiUrl)
             questions = await data.json()
+            isLoading = false
             return questions
     
     
@@ -125,17 +125,21 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
 
 
  async function createQuestionTag(number,selectedCategory,selectedDifficulty){
-    //console.log(selectedCategory,selectedDifficulty)
+    if(questions.length === 0){
+        nextQuestionButton.disabled = true
+        questionsContainer.innerHTML = `<p style="text-align:center">Loading...</p>`
+        await getQuestions(selectedCategory,selectedDifficulty)
+        isLoading = false
 
-    if(questions.length === 0) await getQuestions(selectedCategory,selectedDifficulty)
+    } 
+
     const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
+    isLoading 
 
-    if(isLoading){
-        questionsContainer.innerHTML = `<p style="text-align:center">Loading...</p>`
-        nextQuestionButton.disabled = true
-    }
+    if(!isLoading){
+    
 
 
         if(loadedQuestions != undefined && loadedQuestions.length > 0){
@@ -169,6 +173,7 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
             }
     
         })}
+    }
 
         else{
             questionsContainer.innerHTML = `<p style="text-align: center">Error Occured :(</p>`
@@ -209,7 +214,6 @@ nextQuestionButton.addEventListener("click",(e)=>{
     if(questionNumber === 10){
         e.target.disabled = true
         prompt(Number(score.innerText),selectedCategory,selectedDifficulty)
-        console.log(questions)
 
     }
     else createQuestionTag(questionNumber,selectedCategory,selectedDifficulty)
