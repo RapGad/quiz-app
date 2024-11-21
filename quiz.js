@@ -1,7 +1,5 @@
 const selectedCategory = localStorage.getItem('category')
 const selectedDifficulty = localStorage.getItem('difficulty')
-
-//const url = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
 const questionsContainer = document.querySelector('.questionsContainer')
 const nextQuestionButton = document.getElementById("nextQuestion")
 const score = document.querySelector(".score")
@@ -21,13 +19,12 @@ function decodeHtmlEntities(encodedStr) {
   
 
 let questionNumber = 0
-
 let progress = 10;
-function prompt(score,cate,lev){
+
+function prompt(currScore,cate,lev){
     const category = cate
     let level = lev
 
-    console.log(category,level)
     const divContainer = document.createElement('div')
     divContainer.setAttribute('class','container')
     const paraEl = document.createElement('p')
@@ -35,22 +32,18 @@ function prompt(score,cate,lev){
     btnsContainer.setAttribute('class','btns')
     const replayButton = document.createElement('button')
     const nextButton = document.createElement('button')
+    
 
-    Number(score) < 5 ? nextButton.disabled = true : null
-    console.log(nextButton.disabled)
-
-    Number(score) >4 ? lev != 'hard' ?
+    Number(currScore) >4 ? lev != 'hard' ?
     paraEl.textContent = `
-    You Scored ${score} out of 10\n
+    You Scored ${currScore} out of 10\n
     Do you wish to move to the next difficulty level or replay??`:paraEl.textContent = `
-    You Scored ${score} out of 10 \n
+    You Scored ${currScore} out of 10 \n
     Yeeeyyyyy You beat Our last level
-    `: paraEl.textContent =`You Scored ${score} out of 10 \n
+    `: paraEl.textContent =`You Scored ${currScore} out of 10 \n
     Do you wish to replay`
 
-
-
-    if (nextButton.disabled === false) {
+    if (currScore > 4) {
         switch(level){
         case 'easy':
             level = 'medium'
@@ -62,9 +55,8 @@ function prompt(score,cate,lev){
 
         default:
             level = 'easy'
+        }
     }
-}
-
 
 
     replayButton.textContent = 'replay'
@@ -73,13 +65,20 @@ function prompt(score,cate,lev){
     divContainer.append(paraEl,btnsContainer)
     questionsContainer.replaceChildren(divContainer)
 
+    if(currScore < 5){
+        console.log(currScore)
+        nextButton.disabled = true
+    }
+
 
 
 
     //The innner functions cannot take parameters from the outer functions
     //I have to create a variable in the outer function
     //And set that variable to to the parameters in the inner functions...
+
     replayButton.addEventListener('click',async()=>{
+        score.innerText = 0
         questionNumber = 0
         progress = 10
         questions = []
@@ -90,10 +89,11 @@ function prompt(score,cate,lev){
     })
 
     nextButton.addEventListener('click',()=>{
+        score.innerText = 0
         questionNumber = 0
         progress = 10
         document.getElementById("progress-bar").style.width = progress + "%";
-
+        questions = []
         createQuestionTag(questionNumber,category,level)
         nextQuestionButton.disabled = false
 
@@ -103,6 +103,7 @@ function prompt(score,cate,lev){
 
 const getQuestions = async(selectedCategory,selectedDifficulty)=>{
     const apiUrl = `https://opentdb.com/api.php?amount=10&category=${selectedCategory}&difficulty=${selectedDifficulty}&type=multiple`
+    console.log(apiUrl)
     if(questions.length === 0 && !isLoading){
         isLoading = true
         try{
@@ -136,9 +137,9 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
     const loadedQuestions = questions.results
     let correctAnswer = Math.floor(Math.random()*4) 
     let ansValue
-    isLoading 
+    console.log(error)
 
-    if(!isLoading){
+    if(!isLoading && !error){
     
 
 
@@ -191,7 +192,7 @@ const getQuestions = async(selectedCategory,selectedDifficulty)=>{
         answer.addEventListener('click',(e)=>{
             if(e.target.id == correctAnswer){
                 answer.style.border = "1px solid #4caf50"
-                score.textContent = `${Number(score.innerText)+ 10}`
+                score.textContent = `${Number(score.innerText)+ 1}`
             }
             else{
                 answer.style.border = "1px solid red"
@@ -218,21 +219,13 @@ nextQuestionButton.addEventListener("click",(e)=>{
     }
     else createQuestionTag(questionNumber,selectedCategory,selectedDifficulty)
 
-    progressBar(progress)
+    //progressBar(progress)
+    if (progress < 100) {
+        progress += 10; // Increase by 10% each time
+        document.getElementById("progress-bar").style.width = progress + "%";
+    }
     //
     
     
     
 })
-
-
-
-
-function progressBar(progress){
-    if (progress < 100) {
-        progress += 10; // Increase by 10% each time
-        document.getElementById("progress-bar").style.width = progress + "%";
-    }
-
-}
-
